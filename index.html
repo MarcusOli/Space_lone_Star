@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprendendo Canvas</title>
+    <link rel="shortcut icon" href="">
+    <style>
+        canvas {
+            border: 1px solid gray;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="jogo" width="700" height="600"></canvas>
+
+    <script >
+        class Sprite {
+            constructor(x, y, largura, altura, imagem,type='rect') {
+                this.x = x;
+                this.y = y;
+                this.largura = largura;
+                this.altura = altura;
+                this.imagem = imagem;
+                this.type = type
+            }
+
+            desenha(ctx) {
+                if (this.imagem) {
+                    ctx.drawImage(this.imagem, this.x, this.y, this.largura, this.altura);
+                } else if(this.type == 'triangle') {
+                    ctx.strokeStyle = 'darkred';
+                    ctx.fi
+                    ctx.beginPath();
+                    ctx.moveTo(this.x, this.y);
+                    ctx.lineTo(this.x+ this.largura/2, this.y+this.altura);
+                    ctx.lineTo(this.x+this.largura, this.y)
+                    ctx.closePath();
+                    ctx.fillStyle = "red";
+                    ctx.fill();
+                    ctx.stroke();
+                } else {
+                    ctx.strokeRect(this.x, this.y, this.largura, this.altura);
+                }
+            }
+        }
+
+        let canvasEl = document.querySelector('#jogo');
+        let ctx = canvasEl.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+
+        let background = new Image();
+        background.src = 'imgs/back.jpg'
+
+        background.onload = function(){
+            desenhaJogo();   
+        }
+        let ImgOvini = new Image()
+        ImgOvini.src = 'imgs/ovini.png'
+        let imagemEstrela = new Image();
+        imagemEstrela.src = 'imgs/estrela.png';
+        let slime = new Sprite(350, 550, 50, 50, imagemEstrela);
+        let ovinis = []
+        ovinis.push(new Sprite(200,90,40,80,ImgOvini))
+        ovinis.push(new Sprite(250,90,40,80,ImgOvini))
+        ovinis.push(new Sprite(300,90,40,80,ImgOvini))
+        let tiros = []
+        tiros.push(new Sprite(200,170,20,20,undefined,'triangle'))
+        tiros.push(new Sprite(250,170,20,20,undefined,'triangle'))
+        tiros.push(new Sprite(300,170,20,20,undefined,'triangle'))
+
+        
+
+        // assim que a imagem estiver pronta, manda desenhar o jogo
+        imagemEstrela.addEventListener('load', (evento) => {
+            desenhaJogo();
+        });
+        
+        // qdo mouse movimenta, define posição do slime e redesenha
+        canvasEl.addEventListener('mousemove', (evento) => {
+            slime.x = evento.offsetX - slime.largura/2;
+            slime.y = evento.offsetY - slime.altura/2;
+            desenhaJogo();
+        });
+        
+        // 1. apaga tudo, 2. desenha slime e 3. meteoros
+        function desenhaJogo() {
+            ctx.clearRect(0, 0, 700, 600);
+
+            ctx.drawImage(background,0,0)
+            slime.desenha(ctx);
+
+            // a. for tradicional
+            // for (let i = 0; i < meteoros.length; i++) {
+            //     meteoros[i].desenha(ctx);
+            // }
+
+            // b. for of
+            for (let ovini of ovinis) {
+                ovini.desenha(ctx);
+            }
+            for (let tiro of tiros) {
+                tiro.desenha(ctx);
+            }
+            
+            // c. forEach
+            // meteoros.forEach(meteoro => meteoro.desenha(ctx));
+        }
+    </script>
+
+</body>
+</html>
